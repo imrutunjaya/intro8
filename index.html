@@ -108,13 +108,6 @@
             margin-top: 10px; /* Space above terminal output */
             font-size: 0.9rem; /* Reduced font size for terminal output */
         }
-
-        /* Media query to hide terminal output on mobile */
-        @media (max-width: 768px) {
-            .terminal-output {
-                display: none; /* Hide terminal output on mobile */
-            }
-        }
     </style>
 </head>
 <body>
@@ -246,9 +239,6 @@
                 { element: 'title', delay: 2000 }, // Title
                 { element: 'booting-text', delay: 2000 }, // Booting text
                 { element: 'booting-subtext', delay: 2000 }, // Booting subtext
-                { element: 'search-status', delay: 800 }, // Step 1
-                { element: 'connect-status', delay: 800 }, // Step 2
-                { element: 'auth-status', delay: 800 }, // Step 3
                 { element: 'init-text', delay: 700 } // Final step
             ];
             
@@ -265,22 +255,20 @@
 
                     // Set the text for the init status
                     if (currentInitStep === 3) {
-                        simulateTyping("Starting service...", () => {
-                            document.getElementById('init-text').textContent = "Searching database...";
-                            document.querySelector('#search-status .status-complete').classList.remove('hidden');
+                        // Show full Linux startup process
+                        simulateTyping("Starting daemon...", () => {
+                            simulateTyping("Starting services...", () => {
+                                simulateTyping("Starting programs...", () => {
+                                    document.getElementById('init-text').textContent = "System ready";
+                                    // Now show the hidden status messages
+                                    document.querySelector('#search-status').classList.remove('hidden');
+                                    document.querySelector('#connect-status').classList.remove('hidden');
+                                    document.querySelector('#auth-status').classList.remove('hidden');
+                                    // Simulate the status messages
+                                    simulateStatusMessages();
+                                });
+                            });
                         });
-                    } else if (currentInitStep === 4) {
-                        simulateTyping("Loading modules...", () => {
-                            document.getElementById('init-text').textContent = "Establishing connection...";
-                            document.querySelector('#connect-status .status-complete').classList.remove('hidden');
-                        });
-                    } else if (currentInitStep === 5) {
-                        simulateTyping("Checking system...", () => {
-                            document.getElementById('init-text').textContent = "Authenticating credentials...";
-                            document.querySelector('#auth-status .status-complete').classList.remove('hidden');
-                        });
-                    } else if (currentInitStep === 6) {
-                        document.getElementById('init-text').textContent = "System ready";
                     }
 
                     currentInitStep++;
@@ -296,6 +284,24 @@
             }
             
             setTimeout(runInitStep, 500);
+        }
+
+        function simulateStatusMessages() {
+            // Simulate the status messages
+            setTimeout(() => {
+                document.getElementById('search-status').querySelector('span').textContent = "Searching database...";
+                document.querySelector('#search-status .status-complete').classList.remove('hidden');
+            }, 1000);
+
+            setTimeout(() => {
+                document.getElementById('connect-status').querySelector('span').textContent = "Establishing connection...";
+                document.querySelector('#connect-status .status-complete').classList.remove('hidden');
+            }, 2000);
+
+            setTimeout(() => {
+                document.getElementById('auth-status').querySelector('span').textContent = "Authenticating credentials...";
+                document.querySelector('#auth-status .status-complete').classList.remove('hidden');
+            }, 3000);
         }
 
         function checkHTTPS() {
@@ -388,10 +394,6 @@
             }
 
             typeNextCharacter(); // Start typing the command
-        }
-
-        function isAndroid() {
-            return /Android/i.test(navigator.userAgent); // Check if the user agent is Android
         }
     </script>
 </body>
