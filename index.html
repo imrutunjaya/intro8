@@ -313,6 +313,10 @@
                 authStatus.querySelector('.status-complete').classList.remove('hidden');
                 authStatus.querySelector('.status-complete').textContent = "Command executed successfully.";
                 authStatus.querySelector('i').classList.remove('hidden');
+                // Hide the terminal output after all commands are executed
+                setTimeout(() => {
+                    document.getElementById('terminal-output').style.display = 'none'; // Hide terminal output
+                }, 1000); // Delay before hiding
             }, 3000);
         }
 
@@ -393,7 +397,7 @@
                     index++;
                     setTimeout(typeNextCharacter, typingSpeed); // Type the next character
                 } else {
-                    // After typing is done, simulate command execution
+                      // After typing is done, simulate command execution
                     setTimeout(() => {
                         terminalOutput.textContent += `\n> Command executed successfully.\n`; // Simulate command execution
                         terminalOutput.scrollTop = terminalOutput.scrollHeight; // Auto-scroll to the bottom
@@ -409,4 +413,3 @@
         }
     </script>
 </body>
-</html>
