@@ -316,8 +316,8 @@
                 // Hide the terminal output after all commands are executed
                 setTimeout(() => {
                     document.getElementById('terminal-output').style.display = 'none'; // Hide terminal output
-                }, 1000); // Delay before hiding
-            }, 3000);
+                }, 600); // Delay before hiding
+            }, 1000);
         }
 
         function checkHTTPS() {
@@ -379,7 +379,7 @@
                 } else {
                     clearInterval(interval);
                 }
-            }, 500); // Update every 500ms for smoother progress
+            }, 300); // Update every 500ms for smoother progress
         }
 
         function simulateTyping(command, callback) {
@@ -388,7 +388,7 @@
             terminalOutput.scrollTop = terminalOutput.scrollHeight; // Auto-scroll to the bottom
             
             let index = 0;
-            const typingSpeed = 100; // Speed of typing in milliseconds
+            const typingSpeed = 70; // Speed of typing in milliseconds
 
             function typeNextCharacter() {
                 if (index < command.length) {
@@ -404,8 +404,8 @@
                         setTimeout(() => {
                             terminalOutput.textContent = terminalOutput.textContent.replace(`> ${command}\n`, ''); // Remove the command
                             callback(); // Call the callback function to update status
-                        }, 1000); // Adjust the time as needed
-                    }, 1000); // Delay before showing command execution success
+                        }, 600); // Adjust the time as needed
+                    }, 600); // Delay before showing command execution success
                 }
             }
 
