@@ -140,14 +140,17 @@
                     <div id="init-messages" class="space-y-2 text-sm">
                         <div class="flex items-center hidden" id="search-status">
                             <span>Searching database...</span>
+                            <span class="status-complete hidden">Command executed successfully.</span>
                             <i class="fas fa-check-circle status-complete hidden"></i>
                         </div>
                         <div class="flex items-center hidden" id="connect-status">
                             <span>Establishing connection...</span>
+                            <span class="status-complete hidden">Command executed successfully.</span>
                             <i class="fas fa-check-circle status-complete hidden"></i>
                         </div>
                         <div class="flex items-center hidden" id="auth-status">
                             <span>Authenticating credentials...</span>
+                            <span class="status-complete hidden">Command executed successfully.</span>
                             <i class="fas fa-check-circle status-complete hidden"></i>
                         </div>
                     </div>
@@ -289,18 +292,27 @@
         function simulateStatusMessages() {
             // Simulate the status messages
             setTimeout(() => {
-                document.getElementById('search-status').querySelector('span').textContent = "Searching database...";
-                document.querySelector('#search-status .status-complete').classList.remove('hidden');
+                const searchStatus = document.getElementById('search-status');
+                searchStatus.querySelector('span').textContent = "Searching database...";
+                searchStatus.querySelector('.status-complete').classList.remove('hidden');
+                searchStatus.querySelector('.status-complete').textContent = "Command executed successfully.";
+                searchStatus.querySelector('i').classList.remove('hidden');
             }, 1000);
 
             setTimeout(() => {
-                document.getElementById('connect-status').querySelector('span').textContent = "Establishing connection...";
-                document.querySelector('#connect-status .status-complete').classList.remove('hidden');
+                const connectStatus = document.getElementById('connect-status');
+                connectStatus.querySelector('span').textContent = "Establishing connection...";
+                connectStatus.querySelector('.status-complete').classList.remove('hidden');
+                connectStatus.querySelector('.status-complete').textContent = "Command executed successfully.";
+                connectStatus.querySelector('i').classList.remove('hidden');
             }, 2000);
 
             setTimeout(() => {
-                document.getElementById('auth-status').querySelector('span').textContent = "Authenticating credentials...";
-                document.querySelector('#auth-status .status-complete').classList.remove('hidden');
+                const authStatus = document.getElementById('auth-status');
+                authStatus.querySelector('span').textContent = "Authenticating credentials...";
+                authStatus.querySelector('.status-complete').classList.remove('hidden');
+                authStatus.querySelector('.status-complete').textContent = "Command executed successfully.";
+                authStatus.querySelector('i').classList.remove('hidden');
             }, 3000);
         }
 
@@ -390,11 +402,4 @@
                             callback(); // Call the callback function to update status
                         }, 1000); // Adjust the time as needed
                     }, 1000); // Delay before showing command execution success
-                }
-            }
-
-            typeNextCharacter(); // Start typing the command
-        }
-    </script>
-</body>
-</html>
+     
