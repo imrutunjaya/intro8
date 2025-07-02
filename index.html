@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr.Researcher</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            background-color: black; /* Set background color to black */
+            color: white; /* Set default text color to white */
+            display: flex; /* Use Flexbox for centering */
+            justify-content: center; /* Center horizontally */
+            align-items: center; /* Center vertically */
+            height: 100vh; /* Full height */
+            margin: 0; /* Remove default margin */
+            position: relative; /* Position for overlay */
+        }
+        .container {
+            width: 90%; /* Responsive width */
+            max-width: 600px; /* Max width for larger screens */
+            text-align: center; /* Center text */
+        }
+        .connection-card {
+            background-color: transparent; /* Make connection cards transparent */
+            border: 1px solid rgba(255, 255, 255, 0.1); /* Light border for visibility */
+            border-radius: 12px; /* Rounded corners */
+            padding: 1rem; /* Padding for content */
+            transition: background-color 0.3s ease; /* Smooth background transition */
+        }
+        .progress-container {
+            width: 100%; /* Full width */
+            height: 3px; /* Height of the thin linear progress bar */
+            background-color: rgba(255, 255, 255, 0.2); /* Background color of the progress bar */
+            border-radius: 5px; /* Rounded corners */
+            margin-top: 10px; /* Space above the progress bar */
+            position: relative; /* Position for the percentage text */
+        }
+        .progress {
+            height: 100%; /* Full height */
+            background-color: white; /* Progress color */
+            width: 0%; /* Initial width */
+            border-radius: 5px; /* Rounded corners */
+            transition: width 0.5s ease; /* Smooth transition for progress */
+        }
+        .percentage {
+            position: absolute;
+            top: -20px; /* Position above the progress bar */
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem; /* Reduced font size */
+            font-weight: bold;
+            color: white; /* Text color */
+        }
+        .progress-text {
+            margin-top: 5px; /* Space above the progress text */
+            font-size: 0.8rem; /* Reduced font size */
+            color: white; /* Text color */
+        }
+        .info-box {
+            background-color: rgba(0, 0, 0, 0.7); /* Dark transparent background for info box */
+            border: 1px solid rgba(255, 255, 255, 0.2); /* Border for visibility */
+            border-radius: 8px; /* Rounded corners */
+            padding: 1rem; /* Padding for content */
+            margin-top: 1rem; /* Space above the info box */
+        }
+        .hidden {
+            display: none; /* Hide elements */
+        }
+        .visible {
+            display: block; /* Show elements */
+        }
+        .info-item {
+            display: flex; /* Use flexbox for linear layout */
+            align-items: center; /* Center items vertically */
+            margin-bottom: 0.5rem; /* Space between items */
+        }
+        .icon {
+            margin-right: 0.5rem; /* Space between icon and text */
+        }
+        .status-complete {
+            color: green; /* Color for tick mark */
+            margin-left: 0.5rem; /* Space between text and tick mark */
+        }
+        .error-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8); /* Dark background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000; /* Ensure it appears above other content */
+            color: white; /* Text color */
+            text-align: center; /* Center text */
+            display: none; /* Initially hidden */
+        }
+        .blur {
+            filter: blur(5px); /* Blur effect */
+        }
+        .terminal-output {
+            white-space: pre-wrap; /* Preserve whitespace */
+            color: #00ff00; /* Green text for terminal output */
+            font-family: 'Courier New', Courier, monospace; /* Monospace font for terminal look */
+            margin-top: 10px; /* Space above terminal output */
+            font-size: 0.9rem; /* Reduced font size for terminal output */
+        }
+
+        /* Media query to hide terminal output on mobile */
+        @media (max-width: 768px) {
+            .terminal-output {
+                display: none; /* Hide terminal output on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="text-center mb-6" id="content">
+            <h1 class="text-4xl sm:text-5xl font-thin tracking-tighter mb-2 visible" id="title">Dr.Researcher</h1>
+            <p class="text-sm text-gray-400 tracking-wider hidden" id="booting-text">Booting system...</p>
+            <p class="text-xs text-gray-500 mt-1 hidden" id="booting-subtext">Loading core components</p>
+        </div>
+        
+        <div class="space-y-6">
+            <!-- Loading Animation -->
+            <div class="connection-card" id="loading-card">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <div class="animate-spin" aria-label="Loading system...">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 6v3m4 7h3m-7 4v-3m-4-7H6" stroke-linecap="round"/>
+                            </svg>
+                        </div>
+                        <div id="init-status">
+                            <p class="text-gray-400 hidden" id="init-text">Booting system...</p>
+                            <p class="text-xs text-gray-500 mt-1 hidden" id="init-subtext">Loading core components</p>
+                        </div>
+                    </div>
+                    <div id="loading-status" class="text-xs text-gray-500"></div>
+                </div>
+                <div class="mt-3 pt-3 border-t border-gray-800">
+                    <p class="text-xs text-gray-400 mb-1">System Status</p>
+                    <div id="init-messages" class="space-y-2 text-sm">
+                        <div class="flex items-center hidden" id="search-status">
+                            <span>Searching database...</span>
+                            <i class="fas fa-check-circle status-complete hidden"></i>
+                        </div>
+                        <div class="flex items-center hidden" id="connect-status">
+                            <span>Establishing connection...</span>
+                            <i class="fas fa-check-circle status-complete hidden"></i>
+                        </div>
+                        <div class="flex items-center hidden" id="auth-status">
+                            <span>Authenticating credentials...</span>
+                            <i class="fas fa-check-circle status-complete hidden"></i>
+                        </div>
+                    </div>
+                    <div class="terminal-output" id="terminal-output"></div> <!-- Terminal output integrated here -->
+                </div>
+            </div>
+            <!-- Linear Progress Indicator -->
+            <div class="connection-card" id="connection-status-card">
+                <div class="mb-4">
+                    <p class="text-xs text-gray-400 mb-1">Network Status</p>
+                    <div id="network-status">
+                        <span id="status-text">Checking connection...</span>
+                    </div>
+                </div>
+                <div class="flex items-center mb-4">
+                    <div class="w-8 h-8 rounded-full bg-gray-800 flex items-center justify-center mr-3">
+                        <i class="fas fa-plug text-lg text-blue-400"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-light">Connection Status</h3>
+                        <p class="text-gray-400 text-sm font-light">Real-time network monitoring</p>
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <div class="progress-container">
+                        <div class="progress" id="progress-bar"></div>
+                        <div class="percentage" id="percentage-text">0%</div>
+                    </div>
+                    <p class="progress-text" id="progress-description">Initializing...</p> <!-- Text-based progress description -->
+                </div>
+            </div>
+            <!-- Enhanced System Information Box -->
+            <div class="info-box">
+                <h3 class="text-lg font-semibold">System Information</h3>
+                <div class="info-item">
+                    <i class="fab fa-github icon text-gray-400"></i>
+                    <p class="text-sm">Version: 3.2</p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-calendar-alt icon text-gray-400"></i>
+                    <p class="text-sm">Last Update: <span id="last-update-date"></span></p>
+                </div>
+                <div class="info-item">
+                    <i class="fas fa-check-circle icon text-green-400"></i>
+                    <p class="text-sm">Status: All systems live</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="mt-8 text-center text-xs text-gray-500">
+            <p> Dr.Researcher™ # Mrutunjaya Pradhan.</p>
+        </div>
+    </div>
+
+    <!-- Error Overlay -->
+    <div class="error-overlay" id="error-overlay">
+        <div>
+            <i class="fas fa-exclamation-triangle text-red-500 text-4xl"></i>
+            <p class="text-lg">No Internet Connection</p>
+            <p class="text-sm">Internet is required to continue.</p>
+            <button id="refresh-btn" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none">
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set the last update date to today
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('last-update-date').textContent = today.toLocaleDateString(undefined, options);
+
+            // Initialize system sequence
+            initializeSystem();
+
+            // Check connection status on load
+            checkConnection();
+
+            // Add event listener for the refresh button
+            document.getElementById('refresh-btn').addEventListener('click', function() {
+                checkConnection();
+            });
+        });
+
+        function initializeSystem() {
+            const initSteps = [
+                { element: 'title', delay: 2000 }, // Title
+                { element: 'booting-text', delay: 2000 }, // Booting text
+                { element: 'booting-subtext', delay: 2000 }, // Booting subtext
+                { element: 'search-status', delay: 800 }, // Step 1
+                { element: 'connect-status', delay: 800 }, // Step 2
+                { element: 'auth-status', delay: 800 }, // Step 3
+                { element: 'init-text', delay: 700 } // Final step
+            ];
+            
+            let currentInitStep = 0;
+            
+            function runInitStep() {
+                if (currentInitStep < initSteps.length) {
+                    const step = initSteps[currentInitStep];
+                    const element = document.getElementById(step.element);
+                    
+                    // Show the current element
+                    element.classList.remove('hidden');
+                    element.classList.add('visible');
+
+                    // Set the text for the init status
+                    if (currentInitStep === 3) {
+                        simulateTyping("Starting service...", () => {
+                            document.getElementById('init-text').textContent = "Searching database...";
+                            document.querySelector('#search-status .status-complete').classList.remove('hidden');
+                        });
+                    } else if (currentInitStep === 4) {
+                        simulateTyping("Loading modules...", () => {
+                            document.getElementById('init-text').textContent = "Establishing connection...";
+                            document.querySelector('#connect-status .status-complete').classList.remove('hidden');
+                        });
+                    } else if (currentInitStep === 5) {
+                        simulateTyping("Checking system...", () => {
+                            document.getElementById('init-text').textContent = "Authenticating credentials...";
+                            document.querySelector('#auth-status .status-complete').classList.remove('hidden');
+                        });
+                    } else if (currentInitStep === 6) {
+                        document.getElementById('init-text').textContent = "System ready";
+                    }
+
+                    currentInitStep++;
+                    setTimeout(runInitStep, step.delay);
+                } else {
+                    checkHTTPS();
+                    document.getElementById('connection-status-card').classList.add('visible');
+                    setTimeout(() => {
+                        document.getElementById('connection-status-card').classList.add('visible');
+                    }, 500); // Delay for the connection status card to appear
+                    simulateConnectionProgress(); // Start the progress simulation
+                }
+            }
+            
+            setTimeout(runInitStep, 500);
+        }
+
+        function checkHTTPS() {
+            setTimeout(function() {
+                const httpsText = document.getElementById('https-status-text');
+                
+                if (window.location.protocol === 'https:') {
+                    httpsText.textContent = 'HTTPS Secure';
+                } else {
+                    httpsText.textContent = 'HTTP Not Secure';
+                }
+            }, 1000);
+        }
+        
+        function checkConnection() {
+            const statusText = document.getElementById('status-text');
+            const errorOverlay = document.getElementById('error-overlay');
+            const connectionCards = document.querySelectorAll('.connection-card');
+
+            if (navigator.onLine) {
+                statusText.textContent = 'Online';
+                errorOverlay.style.display = 'none'; // Hide error overlay
+                connectionCards.forEach(card => card.classList.remove('blur')); // Remove blur effect
+            } else {
+                showError();
+            }
+        }
+
+        function showError() {
+            const errorOverlay = document.getElementById('error-overlay');
+            const connectionCards = document.querySelectorAll('.connection-card');
+
+            errorOverlay.style.display = 'flex'; // Show error overlay
+            connectionCards.forEach(card => card.classList.add('blur')); // Apply blur effect
+        }
+        
+        function simulateConnectionProgress() {
+            const percentText = document.getElementById('percentage-text');
+            const progressBar = document.getElementById('progress-bar');
+            const progressDescription = document.getElementById('progress-description');
+            const progressValues = [
+                { value: 0, text: "Initializing..." },
+                { value: 10, text: "Connecting to server..." },
+                { value: 30, text: "Searching database..." },
+                { value: 50, text: "Establishing connection..." },
+                { value: 70, text: "Authenticating credentials..." },
+                { value: 90, text: "Finalizing..." },
+                { value: 100, text: "Complete!" }
+            ];
+            let index = 0;
+
+            const interval = setInterval(() => {
+                if (index < progressValues.length) {
+                    const progress = progressValues[index];
+                    percentText.textContent = `${progress.value}%`; // Update the percentage text
+                    progressBar.style.width = `${progress.value}%`; // Update the progress bar width
+                    progressDescription.textContent = progress.text; // Update the progress description
+                    index++;
+                } else {
+                    clearInterval(interval);
+                }
+            }, 500); // Update every 500ms for smoother progress
+        }
+
+        function simulateTyping(command, callback) {
+            const terminalOutput = document.getElementById('terminal-output');
+            terminalOutput.textContent += `> `; // Start the command line
+            terminalOutput.scrollTop = terminalOutput.scrollHeight; // Auto-scroll to the bottom
+            
+            let index = 0;
+            const typingSpeed = 100; // Speed of typing in milliseconds
+
+            function typeNextCharacter() {
+                if (index < command.length) {
+                    terminalOutput.textContent += command.charAt(index); // Add the next character
+                    terminalOutput.scrollTop = terminalOutput.scrollHeight; // Auto-scroll to the bottom
+                    index++;
+                    setTimeout(typeNextCharacter, typingSpeed); // Type the next character
+                } else {
+                    // After typing is done, simulate command execution
+                    setTimeout(() => {
+                        terminalOutput.textContent += `\n> Command executed successfully.\n`; // Simulate command execution
+                        terminalOutput.scrollTop = terminalOutput.scrollHeight; // Auto-scroll to the bottom
+                        setTimeout(() => {
+                            terminalOutput.textContent = terminalOutput.textContent.replace(`> ${command}\n`, ''); // Remove the command
+                            callback(); // Call the callback function to update status
+                        }, 1000); // Adjust the time as needed
+                    }, 1000); // Delay before showing command execution success
+                }
+            }
+
+            typeNextCharacter(); // Start typing the command
+        }
+
+        function isAndroid() {
+            return /Android/i.test(navigator.userAgent); // Check if the user agent is Android
+        }
+    </script>
+</body>
+</html>
