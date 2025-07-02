@@ -281,12 +281,12 @@
                     document.getElementById('connection-status-card').classList.add('visible');
                     setTimeout(() => {
                         document.getElementById('connection-status-card').classList.add('visible');
-                    }, 500); // Delay for the connection status card to appear
+                    }, 100); // Delay for the connection status card to appear
                     simulateConnectionProgress(); // Start the progress simulation
                 }
             }
             
-            setTimeout(runInitStep, 500);
+            setTimeout(runInitStep, 100);
         }
 
         function simulateStatusMessages() {
@@ -379,7 +379,7 @@
                 } else {
                     clearInterval(interval);
                 }
-            }, 300); // Update every 500ms for smoother progress
+            }, 500); // Update every 500ms for smoother progress
         }
 
         function simulateTyping(command, callback) {
@@ -388,7 +388,7 @@
             terminalOutput.scrollTop = terminalOutput.scrollHeight; // Auto-scroll to the bottom
             
             let index = 0;
-            const typingSpeed = 70; // Speed of typing in milliseconds
+            const typingSpeed = 7; // Speed of typing in milliseconds
 
             function typeNextCharacter() {
                 if (index < command.length) {
